@@ -1,34 +1,3 @@
-"""SUBSTITUTE half-hourly GBP/USD bid/ask series for Experiment 3 (paper Sec. IV-B).
-
-The paper used Olsen HFDF96 half-hourly USD/GBP quotes (Jan-Aug 1996, commercial).
-We build the same kind of series from free tick data with real bid AND ask quotes.
-
-Source used for the results: HistData.com GBP/USD tick data, Sep 2009 - Aug 2010
-(monthly zips in data/raw/histdata/, downloaded by hand; see NOTES.md):
-  * HISTDATA_COM_ASCII_GBPUSD_T{YYYYMM}.zip holds DAT_ASCII_GBPUSD_T_{YYYYMM}.csv
-  * rows "YYYYMMDD HHMMSSNNN,bid,ask,volume" (volume is always 0)
-  * times are EST WITHOUT daylight saving (HistData spec), so UTC = EST + 5 h, and
-    each monthly file covers its EST calendar month
-
-Earlier source (abandoned: the server throttled the download to days):
-Dukascopy hourly .bi5 files (experiments/fetch_fx.py):
-
-  * each hourly .bi5 file is LZMA-compressed; each tick is 20 bytes, big-endian:
-    uint32 ms since the hour, uint32 ask, uint32 bid, float32 ask vol, float32 bid vol;
-    prices are in units of 1e-5
-  * a half-hourly series takes the LAST bid and ask quote in each 30-minute bar
-    (the quote standing at the bar's close)
-  * bars with no ticks (weekends, holidays) are dropped, giving the
-    "24 hour, 5 days a week" market of the paper
-
-Derived series, row t = close of bar t:
-  mid_t   = (bid_t + ask_t) / 2
-  r_t     = mid_t / mid_{t-1} - 1             return of holding 1 unit over bar t
-  delta_t = (ask_t - bid_t) / (2 mid_t)       half the relative spread at time t
-With the additive return R_t = F_{t-1} r_t - delta_t |F_t - F_{t-1}|, a trade
-from neutral to long pays half the spread, and long -> short pays the full spread:
-exactly the cost of trading at the bid/ask.
-"""
 import lzma
 import os
 import struct
@@ -54,16 +23,12 @@ def read_hour(path, hour_start):
 
 
 def market_closed(t):
-    """True for the weekend hours Fri 22:00 - Sun 20:59 UTC, when FX does not trade.
-    These hours were empty in every one of the 17 weeks first downloaded
-    (Sep-Dec 2003), so fetch_fx.py does not request them (NOTES.md)."""
     wd, h = t.weekday(), t.hour
     return (wd == 4 and h >= 22) or wd == 5 or (wd == 6 and h <= 20)
 
 
 def load_ticks(raw_dir, start, end):
-    """All ticks in [start, end) from the cached hourly files (closed weekend hours may
-    be absent)."""
+    """All ticks in [start, end) from the cached hourly files."""
     frames, t = [], pd.Timestamp(start)
     missing = []
     while t < pd.Timestamp(end):
@@ -139,8 +104,7 @@ def build_fx(raw_dir, start, end):
 
 
 def lagged_returns(r, n_lags, scale):
-    """X[t] = [r_{t-n_lags+1}, ..., r_t] / scale; rows without full history are zero.
-    Only data up to t is used."""
+    """X[t] = [r_{t-n_lags+1}, ..., r_t] / scale; rows without full history are zero"""
     T = len(r)
     X = np.zeros((T, n_lags))
     for j in range(n_lags):

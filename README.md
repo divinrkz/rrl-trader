@@ -1,10 +1,14 @@
-# Learning to Trade via Direct Reinforcement: a reproduction
+# Recurrent RL Trader.
 
-Reimplementation of Moody & Saffell, *Learning to Trade via Direct Reinforcement*, IEEE Trans. Neural Networks 12(4), 2001.
+Implementation of Moody & Saffell, *Learning to Trade via Direct Reinforcement*, IEEE Trans. Neural Networks 12(4), 2001.
 
-## Method in one paragraph
 
-A trader is a single recurrent tanh unit, `F_t = sign(tanh(θ · [1, x_t, F_{t−1}]))`, that takes a long (+1) or short (−1) position. Feeding back its own previous position lets it "know" what a trade would cost. Its trading return is `R_t = F_{t−1} r_t − δ |F_t − F_{t−1}|`: profit from the position held over the period, minus the cost of changing it. Instead of forecasting prices or learning a value function, **Recurrent Reinforcement Learning (RRL)** adjusts θ by gradient ascent directly on a trading performance measure. Here that measure is the **differential Sharpe ratio** `D_t`, the first-order effect of the latest return on an exponential moving Sharpe ratio, which allows on-line updates `θ += ρ · dD_t/dR_t · dR_t/dθ`. Because `F_t` depends on `F_{t−1}`, `dR_t/dθ` needs the *total* derivative `dF_t/dθ = ∂F_t/∂θ + ∂F_t/∂F_{t−1} · dF_{t−1}/dθ`, a recursion like real-time recurrent learning. That recursion is what makes the trader cost-aware. The paper compares this "policy search" approach with Q-learning on monthly S&P 500 / T-bill allocation.
+-------
+
+## Method
+Basically, a trader is a single recurrent tanh unit, `F_t = sign(tanh(θ · [1, x_t, F_{t−1}]))`, that takes a long (+1) or short (−1) positions. Its trading return is `R_t = F_{t−1} r_t − δ |F_t − F_{t−1}|`: which is just the profit from the position held over the period, minus the cost of changing it. Instead of forecasting prices or learning a value function, **Recurrent Reinforcement Learning (RRL)** adjusts θ by gradient ascent directly on a trading performance measure. We use both the **differential Sharpe ratio** `D_t`, the first-order effect of the latest return on an exponential moving Sharpe ratio, and **differential downside deviation ratio** (analogous to sterling ratio just because it is kinda harder to deal with minimizing drawdowns.) which allows on-line updates. The paper also compares this direct reinforcement approach with Q-learning on monthly S&P 500 / T-bill allocation.
+
+Here is the [paper](https://ieeexplore.ieee.org/document/935097).
 
 ## Layout and how to run
 
