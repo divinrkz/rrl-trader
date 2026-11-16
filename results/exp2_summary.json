@@ -1,0 +1,94 @@
+{
+  "Buy and hold": {
+    "final_equity": 13.154274108489208,
+    "sharpe": 0.29341467395477183,
+    "max_drawdown": 0.4274262840669725,
+    "trade_freq_pct": 0.0
+  },
+  "RRL committee": {
+    "final_equity": 39.97404838355853,
+    "sharpe": 0.5923414770853923,
+    "max_drawdown": 0.21187150038700253,
+    "trade_freq_pct": 13.0
+  },
+  "Q committee": {
+    "final_equity": 15.657487753534687,
+    "sharpe": 0.3425096983556421,
+    "max_drawdown": 0.2928886804606816,
+    "trade_freq_pct": 20.666666666666668
+  },
+  "RRL individual traders": {
+    "final_equity": {
+      "median": 32.9496000388757,
+      "q25": 26.809394193885684,
+      "q75": 37.40045907393224
+    },
+    "sharpe": {
+      "median": 0.5398192123013268,
+      "q25": 0.4841913163260506,
+      "q75": 0.5720337603461049
+    },
+    "max_drawdown": {
+      "median": 0.21187150038700264,
+      "q25": 0.19961835144114407,
+      "q75": 0.21524266205125245
+    },
+    "trade_freq_pct": {
+      "median": 13.666666666666666,
+      "q25": 11.833333333333332,
+      "q75": 14.333333333333334
+    }
+  },
+  "Q individual traders": {
+    "final_equity": {
+      "median": 6.822869941083141,
+      "q25": 3.1018012849020047,
+      "q75": 12.288657657545437
+    },
+    "sharpe": {
+      "median": 0.10089231603414378,
+      "q25": -0.08438177210196679,
+      "q75": 0.2764626082329353
+    },
+    "max_drawdown": {
+      "median": 0.2948739452441307,
+      "q25": 0.2719372642446768,
+      "q75": 0.39821789000346985
+    },
+    "trade_freq_pct": {
+      "median": 24.333333333333336,
+      "q25": 20.166666666666664,
+      "q75": 25.25
+    }
+  },
+  "paper": {
+    "Buy and hold": {
+      "final_equity": 13.48,
+      "sharpe": 0.34
+    },
+    "Q committee": {
+      "final_equity": 33.59,
+      "sharpe": 0.63
+    },
+    "RRL committee": {
+      "final_equity": 58.6,
+      "sharpe": 0.83
+    }
+  },
+  "config": {
+    "seed": 0,
+    "n_rrl": 30,
+    "n_q": 10,
+    "rho": 0.03,
+    "q_method": "q",
+    "q": {
+      "fit_epochs": 30,
+      "weight_decay": 0.01
+    },
+    "test_period": "1970-1994",
+    "eta": 0.01,
+    "weight_decay": 0.01,
+    "delta": 0.005,
+    "data": "SUBSTITUTE data: Yahoo ^GSPC, Shiller, FRED"
+  }
+}
