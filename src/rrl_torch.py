@@ -1,18 +1,8 @@
-"""PyTorch autograd reference for the RRL trader. Used ONLY in tests to verify
-the hand-derived gradients in src/rrl.py via backpropagation through time."""
 import torch
-
 
 def forward(theta, X, r, *, t_start, t_end, delta, mu=1.0, rf=None,
             discrete=False, eta=None, objective="sharpe"):
-    """Re-implements the trader forward pass with autograd.
-
-    Returns the list of R_t tensors, and (if eta is given) the list of D_t with
-    A_{t-1}, B_{t-1} detached, mirroring how the online update treats them.
-
-    For the discrete trader a straight-through estimator is used: the forward
-    value is sign(y_t) but the gradient flows through y_t, which is exactly the
-    surrogate gradient used by src/rrl.py.
+    """Implements the trader forward pass with autograd.
     """
     F_prev = torch.zeros((), dtype=torch.float64)
     Rs, Ds = [], []

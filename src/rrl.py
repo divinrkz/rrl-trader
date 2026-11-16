@@ -1,20 +1,3 @@
-"""Recurrent Reinforcement Learning (RRL) trader, paper Sec. III-A. numpy only.
-
-Policy (a single recurrent tanh unit, paper Eq. 2 with tanh):
-
-    y_t = tanh(theta . [1, x_t, F_{t-1}])
-    F_t = y_t             (continuous trader, F_t in [-1, 1])
-    F_t = sign(y_t)       (discrete {long, short} trader, as in Sec. IV-A and IV-C)
-    F_t = {+1 if y_t > 1/2, -1 if y_t < -1/2, else 0}
-                          ("ternary" {long, short, neutral} trader, Sec. IV-B)
-
-x_t is the input vector available at the end of period t (e.g. the last 8
-price returns). theta = [bias, input weights..., u], where u multiplies F_{t-1}.
-
-For the discrete trader the reward is backpropagated through the
-pre-thresholded output y_t (paper Sec. II-A and III-A: "replacing sign with
-tanh during learning and discretizing the outputs when trading").
-"""
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -65,7 +48,6 @@ def init_theta(n_inputs, rng, scale=0.1):
 
 def trader_step(theta, x_t, F_prev, dF_prev, r_t, rf_t, delta, mu, discrete):
     """One forward step of the trader plus the recurrent gradient.
-    Returns F_t, dF_t/dtheta, R_t, dR_t/dtheta.
     """
     inp = np.empty(len(theta))
     inp[0] = 1.0
@@ -142,13 +124,7 @@ def run_online(theta, X, r, state, *, t_start, t_end, delta, rho=0.0, eta=0.01,
 
 def batch_gradient(theta, X, r, *, t_start, t_end, delta, discrete=False,
                    mu=1.0, rf=None):
-    """Batch RRL, paper Eqs. (25)-(27): exact gradient of the Sharpe ratio.
-
-    U_T = mean(R) / std(R) over t_start..t_end-1 with fixed theta, starting
-    flat (F = 0). Returns (U_T, dU_T/dtheta, R).
-
-    With A = mean(R), B = mean(R^2), K = B - A^2:
-        dU_T/dR_t = (B - A R_t) / (T K^{3/2})
+    """Batch RRL
     """
     F_prev, dF_prev = 0.0, np.zeros(len(theta))
     Rs, dRs = [], []

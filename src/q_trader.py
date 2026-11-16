@@ -1,19 +1,3 @@
-"""Q-learning baseline trader (paper Sec. III-B and IV-C).
-
-State s_t = (x_t, F_{t-1}); action a = F_t in {-1, +1}; reward = the trading
-return R_{t+1} realized over the next month (multiplicative profits, Eq. 7,
-including the transaction cost of moving from F_{t-1} to a).
-Q(s, a) is a two-layer network with 30 tanh hidden units; as in the paper the
-action is an INPUT to the network and the policy is argmax_a Q(s, a).
-
-Training is fitted Q-iteration on Eq. (40): first with gamma = 0 (pure
-one-step reward regression), then with gamma = 0.75, as in the paper.
-NOTE: the paper used Advantage Updating (Baird), a refinement of Q-learning;
-we use plain Q-learning. See NOTES.md.
-
-Because the market inputs x_t do not depend on our actions, every month gives
-transitions for all four (F_{t-1}, a) combinations, which we use as training data.
-"""
 import numpy as np
 
 from src.returns import multiplicative_return
@@ -90,8 +74,7 @@ def make_transitions(X, r, rf, times, delta):
 
 
 def run_policy(net, X, r, rf, t_start, t_end, delta, F_prev=0.0):
-    """Trade greedily over t_start..t_end-1. Same timing as the RRL trader:
-    F_t is chosen at the end of month t; R_t uses F_{t-1} and r_t."""
+    """Trade greedily over t_start..t_end-1. Same timing as the RRL trader."""
     F_hist, R_hist = np.empty(t_end - t_start), np.empty(t_end - t_start)
     for i, t in enumerate(range(t_start, t_end)):
         F = best_action(net, X[t], F_prev)
@@ -104,11 +87,6 @@ def run_policy(net, X, r, rf, t_start, t_end, delta, F_prev=0.0):
 def train_q(net, X, r, rf, train_times, val_range, delta, rng, *, gammas=(0.0, 0.75),
             iterations=(1, 8), fit_epochs=300, lr=0.01, weight_decay=1e-4, score=None):
     """Fitted Q-iteration with early stopping on validation trading performance.
-
-    train_times: decision times usable for training (bootstrap-resampled here).
-    val_range:   (t_start, t_end) of the validation period.
-    score:       function(R, rf) -> scalar to maximize (validation criterion).
-    Returns the best network found.
     """
     boot = rng.choice(train_times, size=len(train_times), replace=True)
     Z, rew, Z_next = make_transitions(X, r, rf, boot, delta)
