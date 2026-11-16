@@ -237,3 +237,4 @@ results/*
 results/exp2_seed*/*
 !results/exp2_seed*/exp2_summary.json
 NOTES.md
+docs/
