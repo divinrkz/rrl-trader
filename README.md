@@ -6,11 +6,11 @@ Implementation of Moody & Saffell, *Learning to Trade via Direct Reinforcement*,
 
 Basically, a trader is a single recurrent tanh unit,
 
-$$F_t = \operatorname{sign}\bigl(\tanh(\theta \cdot [1, x_t, F_{t-1}])\bigr),$$
+$$F_t = \mathrm{sign}(\tanh(\theta \cdot [1, x_t, F_{t-1}]))$$
 
 that takes a long (+1) or short (−1) positions. Its trading return is
 
-$$R_t = F_{t-1} r_t - \delta |F_t - F_{t-1}|,$$
+$$R_t = F_{t-1} r_t - \delta \lvert F_t - F_{t-1} \rvert$$
 
 which is just the profit from the position held over the period, minus the cost of changing it. Instead of forecasting prices or learning a value function, **Recurrent Reinforcement Learning (RRL)** adjusts $\theta$ by gradient ascent directly on a trading performance measure. We use both the **differential Sharpe ratio** $D_t$, the first-order effect of the latest return on an exponential moving Sharpe ratio, and **differential downside deviation** which allows on-line updates. The paper also compares this direct reinforcement approach with Q-learning on monthly S&P 500 / T-bill allocation.
 
